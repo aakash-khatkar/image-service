@@ -20,7 +20,7 @@ The Image Service API is a robust and flexible microservice for managing image f
 Before you begin, ensure you have the following installed on your system:
 
 - **Node.js** (v22.x or later)
-- **Docker** (v20.x or later)
+- **Docker** (v20.10 or later)
 - **Docker Compose** (v2.x or later)
 - **MongoDB** (if not using Docker)
 
@@ -36,15 +36,17 @@ npm install
 
 ## Running the Service with Docker
 
-To start the service using Docker:
+It is currently recommended to run the service using Docker to ensure all prerequisites are met:
 
 1. Build and start the Docker containers:
 
    ```bash
    docker compose up --build
    ```
+The first startup might take some time while the service initializes. Please wait until you see the message: ‘Server is running on port 3000.’
+2. The API documentation is hosted on the service itself. Once the service is running, you can access the Swagger UI at:
 
-2. The service will be available on [http://localhost:3000](http://localhost:3000).
+[http://localhost:3000/api-docs](http://localhost:3000/api-docs)
 
 ## Stopping the Service
 
@@ -72,13 +74,6 @@ This will stop all running containers and remove them.
 - **AWS S3 Integration:** Store images securely using AWS S3.
 - **Swagger/OpenAPI Documentation:** View the API documentation online.
 
-## API Documentation
-
-The API documentation is hosted on the service itself. Once the service is running, you can access the Swagger UI at:
-
-[http://localhost:3000/api-docs](http://localhost:3000/api-docs)
-
-This provides a comprehensive overview of all available endpoints, request/response formats, and example payloads.
 
 ## Directory Structure
 
