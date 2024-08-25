@@ -1,5 +1,10 @@
 // src/config/awsConfig.ts
-import { S3Client, ListBucketsCommand, HeadBucketCommand, CreateBucketCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  ListBucketsCommand,
+  HeadBucketCommand,
+  CreateBucketCommand,
+} from '@aws-sdk/client-s3';
 import logger from '../logging/logger';
 
 // Configure S3 Client
@@ -29,7 +34,9 @@ const ensureBucketExists = async (): Promise<void> => {
   const bucketName = process.env.S3_BUCKET_NAME;
 
   if (!bucketName) {
-    throw new Error('S3_BUCKET_NAME is not defined in the environment variables');
+    throw new Error(
+      'S3_BUCKET_NAME is not defined in the environment variables',
+    );
   }
 
   try {

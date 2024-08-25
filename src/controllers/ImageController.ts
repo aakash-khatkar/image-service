@@ -62,7 +62,7 @@ class ImageController extends AbstractController {
     this.router.get(
       this.path,
       addSearchParams,
-      queryParamJsonParser(["tags"]),
+      queryParamJsonParser(['tags']),
       validationMiddleware(SearchParamsDto, APP_CONSTANTS.query),
       this.asyncRouteHandler(this.listImages),
     );
@@ -78,13 +78,15 @@ class ImageController extends AbstractController {
     next: NextFunction,
   ) => {
     const result = await this.imageService.uploadImage(req.file!);
-    res.status(201).send(
-      this.fmt.formatResponse(
-        result,
-        Date.now() - req.startTime!,
-        'Image uploaded successfully',
-      ),
-    )
+    res
+      .status(201)
+      .send(
+        this.fmt.formatResponse(
+          result,
+          Date.now() - req.startTime!,
+          'Image uploaded successfully',
+        ),
+      );
   };
 
   private uploadExistingImage = async (
@@ -129,7 +131,10 @@ class ImageController extends AbstractController {
     res: Response,
     next: NextFunction,
   ) => {
-    const result = await this.imageService.updateImageMeta(req.params.id, req.body);
+    const result = await this.imageService.updateImageMeta(
+      req.params.id,
+      req.body,
+    );
     res
       .status(200)
       .json(
@@ -182,15 +187,20 @@ class ImageController extends AbstractController {
     next: NextFunction,
   ) => {
     try {
-      const { fileStream, image } = await this.imageService.getImageFile(req.params.id);
-      
+      const { fileStream, image } = await this.imageService.getImageFile(
+        req.params.id,
+      );
+
       // Set the Content-Disposition header to trigger download with the correct filename
       const filename = `${image.title}`;
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-      
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${filename}"`,
+      );
+
       // Set the Content-Type header based on the image's file type
       res.setHeader('Content-Type', image.fileType);
-  
+
       // Pipe the file stream to the response
       fileStream.pipe(res);
     } catch (error) {

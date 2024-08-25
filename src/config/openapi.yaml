@@ -80,7 +80,14 @@ paths:
           required: false
           schema:
             type: string
-            enum: [modificationDateFile, modificationDateMeta, title, fileSize, createdAt]
+            enum:
+              [
+                modificationDateFile,
+                modificationDateMeta,
+                title,
+                fileSize,
+                createdAt,
+              ]
             example: createdAt
         - name: sortOrder
           in: query
@@ -112,18 +119,18 @@ paths:
             description: MongoDB ObjectId
       responses:
         '200':
-         description: Image file retrieved successfully
-         headers:
-           Content-Disposition:
-             description: Indicates that the content should be downloaded as a file
-             schema:
-               type: string
-               example: 'attachment; filename="image.jpg"'
-         content:
-           application/octet-stream:
-             schema:
-               type: string
-               format: binary
+          description: Image file retrieved successfully
+          headers:
+            Content-Disposition:
+              description: Indicates that the content should be downloaded as a file
+              schema:
+                type: string
+                example: 'attachment; filename="image.jpg"'
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
         '400':
           description: Invalid request
           content:
@@ -307,17 +314,17 @@ components:
           items:
             $ref: '#/components/schemas/ImageMetadata'
           example:
-            - _id: "66caea9f511d117fb59dda5d"
-              title: "Web_Photo_Editor.jpg"
-              description: ""
+            - _id: '66caea9f511d117fb59dda5d'
+              title: 'Web_Photo_Editor.jpg'
+              description: ''
               lockFile: false
-              createdAt: "2024-08-25T08:26:07.925Z"
-              updatedAt: "2024-08-25T08:26:07.925Z"
-              fileUpdatedAt: "2024-08-25T08:26:07.925Z"
+              createdAt: '2024-08-25T08:26:07.925Z'
+              updatedAt: '2024-08-25T08:26:07.925Z'
+              fileUpdatedAt: '2024-08-25T08:26:07.925Z'
               fileSize: 163113
-              fileType: "image/jpeg"
-              fileUrl: "6c6c2c85-e757-446e-9749-f43a52f265e6"
-              hash: "ca425ab5b27d8259e780e2161982291501c3905ccfdcf35d307dece7b55a34e3"
+              fileType: 'image/jpeg'
+              fileUrl: '6c6c2c85-e757-446e-9749-f43a52f265e6'
+              hash: 'ca425ab5b27d8259e780e2161982291501c3905ccfdcf35d307dece7b55a34e3'
               tags: []
               __v: 0
         errors:
@@ -343,10 +350,10 @@ components:
       type: object
       properties:
         data:
-          type: "null"
+          type: 'null'
           example: null
         errors:
-          type: "null"
+          type: 'null'
           example: null
         message:
           type: string
@@ -414,10 +421,10 @@ components:
       properties:
         title:
           type: string
-          example: "New Name"
+          example: 'New Name'
         description:
           type: string
-          example: "New Description"
+          example: 'New Description'
         lockFile:
           type: boolean
           example: true
@@ -428,15 +435,15 @@ components:
             properties:
               label:
                 type: string
-                example: "Best"
+                example: 'Best'
               color:
                 type: string
-                example: "Red"
+                example: 'Red'
     ErrorResponse:
       type: object
       properties:
         data:
-          type: "null"
+          type: 'null'
         errors:
           type: object
           properties:

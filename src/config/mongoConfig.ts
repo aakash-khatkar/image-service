@@ -2,7 +2,8 @@
 import mongoose from 'mongoose';
 import logger from '../logging/logger';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://mongo:27017/image-service';
+const MONGO_URI =
+  process.env.MONGO_URI || 'mongodb://mongo:27017/image-service';
 
 export const connectToMongo = async (): Promise<void> => {
   try {

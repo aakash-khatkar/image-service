@@ -41,7 +41,7 @@ To start the service using Docker:
 1. Build and start the Docker containers:
 
    ```bash
-   docker-compose up --build
+   docker compose up --build
    ```
 
 2. The service will be available on [http://localhost:3000](http://localhost:3000).
@@ -76,7 +76,7 @@ This will stop all running containers and remove them.
 
 The API documentation is hosted on the service itself. Once the service is running, you can access the Swagger UI at:
 
-[http://localhost:3000/api/v1/docs](http://localhost:3000/api/v1/docs)
+[http://localhost:3000/api-docs](http://localhost:3000/api-docs)
 
 This provides a comprehensive overview of all available endpoints, request/response formats, and example payloads.
 
