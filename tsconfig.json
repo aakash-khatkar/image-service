@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,         // Enable this
+    "emitDecoratorMetadata": true,          // Enable this
+    "strictPropertyInitialization": false,  // Optional: if you want to allow uninitialized properties
+    "strictNullChecks": true,
+    "noImplicitAny": false
+  },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "dist"]
+  }

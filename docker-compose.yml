@@ -1,0 +1,60 @@
+services:
+  setup:
+    image: alpine:latest
+    volumes:
+      - .:/usr/src/app
+    working_dir: /usr/src/app
+    command: sh ./generate_env.sh
+
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+      localstack:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+    volumes:
+      - .:/usr/src/app
+    command: npm run dev
+    environment:
+      PORT: 3000
+      MONGO_URI: mongodb://mongo:27017/image-service
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_REGION: us-east-1
+      S3_BUCKET_NAME: rubber-chickens-bucket
+      AWS_ENDPOINT: http://localstack:4566
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    command: mongod --quiet --logpath /dev/null --logappend
+
+  localstack:
+    image: localstack/localstack
+    ports:
+      - '4566:4566'
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - DATA_DIR=/var/lib/localstack
+    volumes:
+      - ./localstack/init-scripts:/docker-entrypoint-initaws.d
+      - localstack-data:/var/lib/localstack
+    healthcheck:
+      test: ["CMD", "awslocal", "s3", "ls"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  mongo-data:
+  localstack-data:

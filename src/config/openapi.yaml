@@ -1,0 +1,466 @@
+openapi: 3.1.0
+info:
+  title: Image Service API
+  version: 1.0.0
+  description: API documentation for the Image Service, which handles image uploads, retrievals, updates, deletions, and listings.
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local server
+
+paths:
+  /images:
+    post:
+      summary: Upload a new image. The file name will be used as the title. Other properties can be added via the Update Image Meta API.
+      operationId: uploadImage
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Image uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+
+    get:
+      summary: List images with metadata.
+      operationId: listImages
+      parameters:
+        - name: includeDuplicates
+          in: query
+          required: false
+          schema:
+            type: boolean
+            example: false
+        - name: tags
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              description: MongoDB ObjectId
+        - name: tagMatch
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [all, any]
+            example: any
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 25
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: orderBy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [modificationDateFile, modificationDateMeta, title, fileSize, createdAt]
+            example: createdAt
+        - name: sortOrder
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ASC, DESC]
+            example: DESC
+      responses:
+        '200':
+          description: Images listed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListImagesApiResponse'
+        '500':
+          description: Internal server error
+
+  /images/{id}/file:
+    get:
+      summary: Retrieve an image's file
+      operationId: getImageFile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            description: MongoDB ObjectId
+      responses:
+        '200':
+         description: Image file retrieved successfully
+         headers:
+           Content-Disposition:
+             description: Indicates that the content should be downloaded as a file
+             schema:
+               type: string
+               example: 'attachment; filename="image.jpg"'
+         content:
+           application/octet-stream:
+             schema:
+               type: string
+               format: binary
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Image not found
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Upload or update an existing image file
+      operationId: uploadExistingImage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            description: MongoDB ObjectId
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Existing image uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Image not found
+        '500':
+          description: Internal server error
+
+    delete:
+      summary: Delete an image
+      operationId: deleteImage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            description: MongoDB ObjectId
+      responses:
+        '201':
+          description: Image deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteSuccessResponse'
+        '404':
+          description: Image not found
+        '500':
+          description: Internal server error
+
+  /images/{id}/meta:
+    get:
+      summary: Retrieve an image's metadata
+      operationId: getImageMeta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            description: MongoDB ObjectId
+      responses:
+        '200':
+          description: Image metadata retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: Image not found
+        '500':
+          description: Internal server error
+
+    put:
+      summary: Update image metadata
+      operationId: updateImageMeta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            description: MongoDB ObjectId
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageDto'
+      responses:
+        '200':
+          description: Image metadata updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Image not found
+        '500':
+          description: Internal server error
+
+  /images/s3/list:
+    get:
+      summary: List all image files in the S3 bucket
+      operationId: listS3Images
+      responses:
+        '200':
+          description: S3 images listed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        data:
+          oneOf:
+            - $ref: '#/components/schemas/ImageMetadata'
+            - type: array
+              items:
+                $ref: '#/components/schemas/ImageMetadata'
+            - type: array
+              items:
+                type: string
+        errors:
+          type: object
+          nullable: true
+        message:
+          type: string
+          example: Operation successful
+        meta:
+          type: object
+          properties:
+            length:
+              type: integer
+              example: 1
+            took:
+              type: integer
+              example: 57
+            total:
+              type: integer
+              example: 1
+
+    ListImagesApiResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImageMetadata'
+          example:
+            - _id: "66caea9f511d117fb59dda5d"
+              title: "Web_Photo_Editor.jpg"
+              description: ""
+              lockFile: false
+              createdAt: "2024-08-25T08:26:07.925Z"
+              updatedAt: "2024-08-25T08:26:07.925Z"
+              fileUpdatedAt: "2024-08-25T08:26:07.925Z"
+              fileSize: 163113
+              fileType: "image/jpeg"
+              fileUrl: "6c6c2c85-e757-446e-9749-f43a52f265e6"
+              hash: "ca425ab5b27d8259e780e2161982291501c3905ccfdcf35d307dece7b55a34e3"
+              tags: []
+              __v: 0
+        errors:
+          type: object
+          nullable: true
+        message:
+          type: string
+          example: Images listed successfully
+        meta:
+          type: object
+          properties:
+            length:
+              type: integer
+              example: 1
+            took:
+              type: integer
+              example: 17
+            total:
+              type: integer
+              example: 4
+
+    DeleteSuccessResponse:
+      type: object
+      properties:
+        data:
+          type: "null"
+          example: null
+        errors:
+          type: "null"
+          example: null
+        message:
+          type: string
+          example: Image deleted successfully
+        meta:
+          type: object
+          properties:
+            length:
+              type: integer
+              example: 0
+            took:
+              type: integer
+              example: 487
+            total:
+              type: integer
+              example: 0
+
+    ImageMetadata:
+      type: object
+      properties:
+        id:
+          type: string
+          description: MongoDB ObjectId
+        title:
+          type: string
+        description:
+          type: string
+        lockFile:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        fileUpdatedAt:
+          type: string
+          format: date-time
+        fileSize:
+          type: integer
+        fileType:
+          type: string
+        fileUrl:
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        hash:
+          type: string
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          description: MongoDB ObjectId
+        label:
+          type: string
+        color:
+          type: string
+
+    ImageDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "New Name"
+        description:
+          type: string
+          example: "New Description"
+        lockFile:
+          type: boolean
+          example: true
+        tags:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+                example: "Best"
+              color:
+                type: string
+                example: "Red"
+    ErrorResponse:
+      type: object
+      properties:
+        data:
+          type: "null"
+        errors:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 400
+            errorCode:
+              type: string
+              example: IMAGE_FILE_MISSING/INVALID_ID
+            service:
+              type: string
+              example: IMAGE_SERVICE
+        message:
+          type: string
+          example: Image file is required/Invalid Id
+        meta:
+          type: object
+          properties:
+            length:
+              type: integer
+              example: 0
+            took:
+              type: integer
+              example: 0
+            total:
+              type: integer
+              example: 0
