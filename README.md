@@ -29,7 +29,7 @@ Before you begin, ensure you have the following installed on your system:
 To get started, clone the repository and install the necessary dependencies:
 
 ```bash
-git clone [https://github.com/yourusername/image-service.git](https://github.com/aakash-khatkar/image-service.git)
+git clone https://github.com/yourusername/image-service.git
 cd image-service
 npm install
 ```
