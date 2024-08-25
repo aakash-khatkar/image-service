@@ -40,7 +40,6 @@ paths:
 
     get:
       summary: List images with metadata.
-      operationId: listImages
       parameters:
         - name: includeDuplicates
           in: query
@@ -48,14 +47,15 @@ paths:
           schema:
             type: boolean
             example: false
-        - name: tags
+        - name: tags 
           in: query
           required: false
           schema:
-            type: array
-            items:
-              type: string
-              description: MongoDB ObjectId
+            type: string
+          description: >
+            A JSON array of tag IDs. Example: `["66cb7c2b0275387e0f3df246"]`.
+            - If no tags are available, you can first add tags using the Update Image Meta Data API.
+            - You can leave this parameter empty if you don't want to filter by tags.
         - name: tagMatch
           in: query
           required: false
@@ -81,13 +81,11 @@ paths:
           schema:
             type: string
             enum:
-              [
-                modificationDateFile,
-                modificationDateMeta,
-                title,
-                fileSize,
-                createdAt,
-              ]
+              - modificationDateFile
+              - modificationDateMeta
+              - title
+              - fileSize
+              - createdAt
             example: createdAt
         - name: sortOrder
           in: query
@@ -105,7 +103,6 @@ paths:
                 $ref: '#/components/schemas/ListImagesApiResponse'
         '500':
           description: Internal server error
-
   /images/{id}/file:
     get:
       summary: Retrieve an image's file
